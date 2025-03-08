@@ -19,8 +19,9 @@ This script helps you download book pages from a digital library when you have p
 ## Features
 
 - Downloads book pages in sequence from a digital repository
-- Works with any file naming pattern
-- Supports authentication via cookies
+- Supports multiple file naming patterns and separators
+- Handles multiple page types (like left/right pages) in a single run
+- Supports authentication via cookies with detailed extraction guidance
 - Tests connection before starting batch download
 - Provides real-time progress tracking
 - Color-coded interface for better readability
@@ -38,6 +39,7 @@ This script helps you download book pages from a digital library when you have p
    ```
    pip install requests
    ```
+3. Save the script to a file (e.g., `book_downloader.py`)
 
 ## Usage Instructions
 
@@ -45,7 +47,7 @@ This script helps you download book pages from a digital library when you have p
 
 Run the script with:
 ```
-python3 main.py
+python book_downloader.py
 ```
 
 The script will guide you through the setup process with clear step-by-step instructions.
@@ -64,18 +66,27 @@ http://unilib-dspace.nasledstvo.bg/xmlui/bitstream/handle/nls/29904/
 The script will help you build the correct filename pattern by asking for:
 
 1. **Prefix**: The part of the filename that comes before the page number
-   - Example: For `hristianska_0012_1L.jpg`, the prefix is `hristianska`
    - Example: For `gjuzelev_vasil_006.jpg`, the prefix is `gjuzelev_vasil`
+   - Example: For `satr_bitie_part2 - 0004.jpg`, the prefix is `satr_bitie_part2`
+   - Example: For `document0001.jpg` with no separator, the prefix is `document`
 
-2. **Number of digits**: How many digits are used in the page numbering
+2. **Separator**: The character(s) between the prefix and the page number
+   - Example: For `gjuzelev_vasil_006.jpg`, enter `_`
+   - Example: For `satr_bitie_part2 - 0004.jpg`, enter ` - ` (space-hyphen-space)
+   - Example: For `document0001.jpg`, leave empty (no separator)
+
+3. **Number of digits**: How many digits are used in the page numbering
    - Example: For `006`, enter `3`
-   - Example: For `0012`, enter `4`
+   - Example: For `0004`, enter `4`
 
-3. **Suffix**: Any text between the page number and file extension
+4. **Suffix**: Any text between the page number and file extension
    - Example: For `hristianska_0012_1L.jpg`, the suffix is `_1L`
    - Example: For `gjuzelev_vasil_006.jpg`, leave empty
 
-4. **File extension**: The file format (default is `jpg`)
+5. **Multiple page types**: For books with left/right pages or different image versions
+   - You can specify multiple suffixes to download in a single run (e.g., `_1L` and `_2R`)
+
+6. **File extension**: The file format (default is `jpg`)
 
 ### Step 3: Enter Page Range
 
@@ -94,12 +105,37 @@ The script may need authentication cookies to access protected content:
 - Default cookies are provided but may not work for all books
 - If download fails, you'll need to provide fresh cookies from your browser
 
-#### How to Get Fresh Cookies:
+#### How to Extract Fresh Cookies:
 
-1. Open your browser and navigate to the book viewer page
+**Chrome:**
+1. Navigate to the book viewer page (the actual page where you can see the book)
+2. Press F12 (or Ctrl+Shift+I) to open Developer Tools
+3. Select the "Application" tab
+4. In the left sidebar, expand "Cookies" and click on the website domain
+5. Look for two specific cookies:
+   - `JSESSIONID` - The server session identifier
+   - `dspacc` - The authentication token specific to this digital library
+6. Copy the value of each cookie (not the name)
+
+**Firefox:**
+1. Navigate to the book viewer page
 2. Press F12 to open Developer Tools
-3. Go to Application tab (Chrome) or Storage tab (Firefox)
-4. Select Cookies from the left sidebar
+3. Select the "Storage" tab
+4. Click on "Cookies" in the left sidebar
+5. Find and note the values for `JSESSIONID` and `dspacc`
+
+**Safari:**
+1. First enable Developer Tools: Safari → Preferences → Advanced → "Show Develop menu"
+2. Navigate to the book viewer
+3. Click Develop → Show Web Inspector
+4. Go to the "Storage" tab
+5. Under "Cookies", find the two authentication tokens
+
+**Edge:**
+1. Navigate to the book viewer page
+2. Press F12 to open Developer Tools
+3. Select the "Application" tab
+4. Expand "Cookies" in the left sidebar and click on the website
 5. Find and copy the values for `JSESSIONID` and `dspacc`
 
 ## Examples
@@ -108,8 +144,11 @@ The script may need authentication cookies to access protected content:
 
 - Base URL: `http://unilib-dspace.nasledstvo.bg/xmlui/bitstream/handle/nls/29904/`
 - Prefix: `hristianska`
+- Separator: `_`
 - Number of digits: `4`
-- Suffix: `_1L` for left pages, `_2R` for right pages
+- Multiple page types: Yes
+  - Suffix 1: `_1L` for left pages
+  - Suffix 2: `_2R` for right pages
 - Starting page: `12`
 - Ending page: `100`
 
@@ -117,10 +156,31 @@ The script may need authentication cookies to access protected content:
 
 - Base URL: `http://unilib-dspace.nasledstvo.bg/xmlui/bitstream/handle/nls/12345/`
 - Prefix: `gjuzelev_vasil`
+- Separator: `_`
 - Number of digits: `3`
 - Suffix: (leave empty)
 - Starting page: `6`
 - Ending page: `-1` (automatic)
+
+### Example 3: Downloading "satr_bitie_part2" book with space-hyphen-space separator
+
+- Base URL: `http://unilib-dspace.nasledstvo.bg/xmlui/bitstream/handle/nls/38305/`
+- Prefix: `satr_bitie_part2`
+- Separator: ` - ` (space-hyphen-space)
+- Number of digits: `4`
+- Suffix: (leave empty)
+- Starting page: `4`
+- Ending page: `-1` (automatic)
+
+### Example 4: Downloading a book with no separator between prefix and number
+
+- Base URL: `http://example.org/books/12345/`
+- Prefix: `document`
+- Separator: (leave empty)
+- Number of digits: `4`
+- Suffix: (leave empty)
+- Starting page: `1`
+- Ending page: `200`
 
 ## Troubleshooting
 

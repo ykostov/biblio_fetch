@@ -296,12 +296,29 @@ def get_user_input():
 
     # Get prefix
     print_info("First, enter the PREFIX (the part before the page number)")
-    print_info("Example: For 'gjuzelev_vasil_006.jpg', the prefix is 'gjuzelev_vasil'")
+    print_info("Example 1: For 'gjuzelev_vasil_006.jpg', the prefix is 'gjuzelev_vasil'")
+    print_info("Example 2: For 'satr_bitie_part2 - 0004.jpg', the prefix is 'satr_bitie_part2'")
+    print_info("Example 3: For 'document0001.jpg' with no separator, the prefix is 'document'")
     prefix = input("> Prefix: ").strip()
 
+    # Get separator
+    print_info("\nWhat separator is used between the prefix and page number? (leave empty for no separator)")
+    print_info("Example 1: For 'gjuzelev_vasil_006.jpg', enter '_'")
+    print_info("Example 2: For 'satr_bitie_part2 - 0004.jpg', enter ' - '")
+    print_info("Example 3: For 'prefix0001.jpg', leave empty")
+    separator = input("> Separator (default: '_'): ")
+
+    # Handle the empty separator case
+    if separator.strip() == "":
+        print_info("You've selected no separator - the number will immediately follow the prefix.")
+        separator = ""
+    else:
+        separator = separator.strip() or "_"
+
     # Get number format
-    print_info("\nNext, how many digits are used for page numbers?")
-    print_info("Example: If pages are numbered like '001', '002', etc., enter '3'")
+    print_info("\nHow many digits are used for page numbers?")
+    print_info("Example 1: If pages are numbered like '001', '002', etc., enter '3'")
+    print_info("Example 2: If pages are numbered like '0004', '0005', etc., enter '4'")
     try:
         num_digits = int(input("> Number of digits (default: 3): ").strip() or "3")
     except ValueError:
@@ -342,7 +359,7 @@ def get_user_input():
         extension = '.' + extension
 
     # Create the filename pattern
-    filename_pattern = f"{{prefix}}_{{num:0{num_digits}d}}{{suffix}}{extension}"
+    filename_pattern = f"{{prefix}}{separator}{{num:0{num_digits}d}}{{suffix}}{extension}"
     print_info(f"\nGenerated filename pattern: {filename_pattern}")
 
     # Show example for each suffix
@@ -377,7 +394,7 @@ def get_user_input():
 
     # If end_num is -1, use a very large number and let the script stop on failures
     if end_num == -1:
-        end_num = 99999
+        end_num = 9999
 
     print_step(4, "SET OUTPUT DIRECTORY")
     print_info("This is where the downloaded files will be saved.")
